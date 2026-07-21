@@ -9,7 +9,7 @@ from src.config import Settings, get_settings
 from src.database.repositories import SupabaseRepository
 from src.database.supabase_client import create_supabase_client
 from src.generation.answer_generator import OpenAIGenerationProvider
-from src.generation.citation_builder import source_summary
+from src.generation.citation_builder import source_page_url, source_summary
 from src.generation.service import QuestionAnsweringService
 from src.ingestion.embedding_service import OpenAIEmbeddingProvider
 from src.retrieval.service import HybridRetriever
@@ -130,7 +130,10 @@ def main() -> None:
             if source.hit.published_date:
                 st.caption(f"Published: {source.hit.published_date}")
             if source.hit.source_url:
-                st.link_button("Open official document", source.hit.source_url)
+                st.link_button(
+                    f"Open PDF at page {source.hit.pdf_page_start}",
+                    source_page_url(source),
+                )
 
     with st.expander("Show retrieved evidence"):
         for source in result.sources:

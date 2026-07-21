@@ -1,4 +1,8 @@
-from src.generation.citation_builder import ensure_source_references, source_summary
+from src.generation.citation_builder import (
+    ensure_source_references,
+    source_page_url,
+    source_summary,
+)
 from src.models import EvidenceSource, RetrievalHit
 
 
@@ -24,6 +28,16 @@ def test_source_summary_contains_verifiable_location() -> None:
     assert "S1" in summary
     assert "Article 18" in summary
     assert "PDF page 14" in summary
+
+
+def test_source_page_url_opens_the_first_cited_pdf_page() -> None:
+    assert source_page_url(evidence()) == "https://example.edu/rules.pdf#page=14"
+
+
+def test_source_page_url_preserves_query_parameters() -> None:
+    source = evidence()
+    source.hit.source_url = "https://example.edu/rules.pdf?download=1#old"
+    assert source_page_url(source) == "https://example.edu/rules.pdf?download=1#page=14"
 
 
 def test_missing_inline_references_get_a_source_footer() -> None:

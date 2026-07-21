@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import urlsplit, urlunsplit
 
 from src.models import EvidenceSource
 
@@ -23,6 +24,15 @@ def source_summary(source: EvidenceSource) -> str:
         parts.append(location)
     parts.append(f"PDF page {page_label(source)}")
     return " — ".join(parts)
+
+
+def source_page_url(source: EvidenceSource) -> str:
+    """Return the official PDF URL focused on the first cited PDF page."""
+    hit = source.hit
+    if not hit.source_url:
+        return ""
+    parsed = urlsplit(hit.source_url)
+    return urlunsplit(parsed._replace(fragment=f"page={max(1, hit.pdf_page_start)}"))
 
 
 def ensure_source_references(answer: str, sources: list[EvidenceSource]) -> str:
