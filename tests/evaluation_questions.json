@@ -1,0 +1,16 @@
+[
+  {
+    "question": "What is the maximum course load?",
+    "expected_document": "GJU Laws and Regulations 2026",
+    "expected_article": "18",
+    "expected_page": 514
+  },
+  {
+    "question": "What happens if I miss too many lectures?",
+    "expected_document": "GJU Laws and Regulations 2026"
+  },
+  {
+    "question": "ما هي شروط السنة الألمانية؟",
+    "expected_document": "German Year Manual"
+  }
+]
