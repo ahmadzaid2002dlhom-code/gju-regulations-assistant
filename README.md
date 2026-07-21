@@ -5,6 +5,8 @@ official GJU regulations. It runs Streamlit and PDF extraction locally while
 OpenAI provides embeddings and answer generation, and Supabase stores metadata,
 searchable text, and 768-dimensional vectors.
 
+**Live demo:** https://gju-regulations-assistant.streamlit.app/
+
 ## What is implemented
 
 - Checksum-based PDF ingestion and version tracking
@@ -130,6 +132,22 @@ The unit tests do not call OpenAI or Supabase. Add verified real questions to
 - Public database access is restricted by RLS to current document rows.
 - Questions, retrieval candidates, evidence chunks, and output tokens are capped.
 - `delete_document.py` requires the document UUID twice before deletion.
+
+## How Codex and GPT-5.6 were used
+
+Codex was used throughout the implementation, not only for the initial scaffold.
+It helped turn the architecture into the ingestion, retrieval, generation, and
+database layers; iterate on Arabic reading-order repair and OCR; create the
+Supabase schema and row-level security policies; build and run the test suite;
+diagnose PDF page-link behavior; configure GitHub Actions; and deploy the tested
+application. The key design and safety decisions were reviewed against real
+English and Arabic regulation documents and live retrieval results.
+
+The running product uses GPT-5.6 through the OpenAI Responses API to generate
+answers restricted to retrieved evidence. It is also the selective vision OCR
+fallback for image-only PDF pages. `text-embedding-3-small` provides the
+768-dimensional document and query embeddings used by the hybrid retrieval
+pipeline.
 
 ## Deployment path
 
