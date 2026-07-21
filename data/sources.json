@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "title": "GJU Laws, Regulations, Instructions & Bylaws (English) 2026",
+    "url": "https://www.gju.edu.jo/sites/default/files/Legal%20Consultant%20Department/publications/laws_regulations_and_bylaws_22-4-2026_.pdf",
+    "department": "Legal Consultant Department",
+    "language": "en",
+    "document_type": "regulation",
+    "academic_year": "2026",
+    "published_date": "2026-04-22",
+    "version": "2026",
+    "status": "current"
+  },
+  {
+    "title": "GJU Laws, Regulations, Instructions & Bylaws (Arabic) 2026",
+    "url": "https://www.gju.edu.jo/sites/default/files/Legal%20Consultant%20Department/publications/lnhyy_ktb_lnzm_wltlymt_22-4-2026.pdf",
+    "department": "Legal Consultant Department",
+    "language": "ar",
+    "document_type": "regulation",
+    "academic_year": "2026",
+    "published_date": "2026-04-22",
+    "version": "2026",
+    "status": "current"
+  },
+  {
+    "title": "National Integrity Standards in the Public Sector (Arabic)",
+    "url": "https://www.gju.edu.jo/sites/default/files/Legal%20Consultant%20Department/publications/myr_lnzhh.pdf",
+    "department": "Legal Consultant Department",
+    "language": "ar",
+    "document_type": "integrity_standard",
+    "published_date": "2018-05-17",
+    "version": "2018",
+    "status": "current"
+  },
+  {
+    "title": "National Integrity Standards in the Public Sector (English)",
+    "url": "https://www.gju.edu.jo/sites/default/files/Legal%20Consultant%20Department/publications/national-intrgerity-standarrds-1.pdf",
+    "department": "Legal Consultant Department",
+    "language": "en",
+    "document_type": "integrity_standard",
+    "published_date": "2018-05-17",
+    "version": "2018",
+    "status": "current"
+  }
+]

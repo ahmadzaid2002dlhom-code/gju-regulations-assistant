@@ -51,13 +51,19 @@ def _flatten(groups: Iterable[list[RetrievalHit]]) -> Iterable[RetrievalHit]:
 
 def select_diverse_hits(hits: list[RetrievalHit], limit: int) -> list[RetrievalHit]:
     selected: list[RetrievalHit] = []
+    skipped: list[RetrievalHit] = []
     per_section: dict[tuple[str, str | None], int] = {}
     for hit in hits:
         key = (hit.document_id, hit.article_number or hit.section_title)
         if per_section.get(key, 0) >= 2:
+            skipped.append(hit)
             continue
         selected.append(hit)
         per_section[key] = per_section.get(key, 0) + 1
+        if len(selected) >= limit:
+            return selected
+    for hit in skipped:
+        selected.append(hit)
         if len(selected) >= limit:
             break
     return selected

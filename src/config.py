@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr
     openai_generation_model: str = "gpt-5.6-luna"
     openai_embedding_model: str = "text-embedding-3-small"
+    openai_ocr_model: str = "gpt-5.6-luna"
     embedding_dimensions: int = Field(default=768, ge=1)
 
     supabase_url: str = ""

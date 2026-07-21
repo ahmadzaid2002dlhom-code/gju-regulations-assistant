@@ -2,7 +2,7 @@ from dataclasses import replace
 
 from src.models import RetrievalHit
 from src.retrieval.query_classifier import classify_query, detect_language
-from src.retrieval.reranker import merge_and_rerank
+from src.retrieval.reranker import merge_and_rerank, select_diverse_hits
 
 
 def hit(chunk_id: str, **scores: float) -> RetrievalHit:
@@ -38,3 +38,11 @@ def test_language_and_topic_classification() -> None:
     assert detect_language("ما هو course load المسموح؟") == "mixed"
     assert classify_query("What happens after too many absences?").topic == "attendance"
     assert classify_query("What are the German Year rules?").suggested_document_type == "german_year"
+
+
+def test_diversity_filter_backfills_when_metadata_is_repeated() -> None:
+    hits = [hit(f"c{index}", vector_score=1.0 - index / 10) for index in range(5)]
+
+    selected = select_diverse_hits(hits, 5)
+
+    assert [result.chunk_id for result in selected] == ["c0", "c1", "c2", "c3", "c4"]

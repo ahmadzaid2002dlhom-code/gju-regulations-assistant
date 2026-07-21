@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 from typing import Any
+from uuid import UUID, uuid5
 
 from supabase import Client
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.models import DetectedSection, ExtractedPage, PreparedChunk, SourceDefinition
 
@@ -97,28 +99,42 @@ class SupabaseRepository:
         document_id: str,
         sections: list[DetectedSection],
     ) -> dict[str, str]:
-        section_ids: dict[str, str] = {}
-        for section in sorted(sections, key=lambda value: (value.page_start, value.hierarchy_level)):
-            response = (
-                self._client.table("sections")
-                .insert(
-                    {
-                        "document_id": document_id,
-                        "parent_section_id": section_ids.get(section.parent_local_key or ""),
-                        "title": section.title,
-                        "section_type": section.section_type,
-                        "article_number": section.article_number,
-                        "hierarchy_level": section.hierarchy_level,
-                        "page_start": section.page_start,
-                        "page_end": section.page_end,
-                    }
-                )
-                .execute()
-            )
-            if not response.data:
-                raise RuntimeError(f"Section {section.title!r} was not inserted.")
-            section_ids[section.local_key] = str(response.data[0]["id"])
+        namespace = UUID(document_id)
+        ordered = sorted(
+            sections,
+            key=lambda value: (value.page_start, value.hierarchy_level),
+        )
+        section_ids = {
+            section.local_key: str(uuid5(namespace, section.local_key))
+            for section in ordered
+        }
+        records = [
+            {
+                "id": section_ids[section.local_key],
+                "document_id": document_id,
+                "parent_section_id": section_ids.get(section.parent_local_key or ""),
+                "title": section.title,
+                "section_type": section.section_type,
+                "article_number": section.article_number,
+                "hierarchy_level": section.hierarchy_level,
+                "page_start": section.page_start,
+                "page_end": section.page_end,
+            }
+            for section in ordered
+        ]
+        for batch in _batches(records):
+            self._upsert_section_batch(batch)
         return section_ids
+
+    @retry(stop=stop_after_attempt(4), wait=wait_exponential(min=1, max=8), reraise=True)
+    def _upsert_section_batch(self, records: list[dict[str, Any]]) -> None:
+        response = (
+            self._client.table("sections")
+            .upsert(records, on_conflict="id")
+            .execute()
+        )
+        if len(response.data or []) != len(records):
+            raise RuntimeError("Not all section records were upserted.")
 
     def insert_chunks(
         self,

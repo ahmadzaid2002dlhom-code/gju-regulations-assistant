@@ -8,7 +8,7 @@ from src.models import DetectedSection, ExtractedPage
 
 ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 ARTICLE_PATTERN = re.compile(
-    r"(?im)^\s*(?:Article|المادة)\s*\(?\s*([0-9٠-٩]+)\s*\)?(?:\s*[:.\-–—])?"
+    r"(?im)^\s*(?:Article|المادة|ةالماد)[\s():.\-–—]*([0-9٠-٩]+)[\s():.\-–—]*"
 )
 CHAPTER_PATTERN = re.compile(
     r"(?im)^\s*(?:Chapter|الفصل)\s+([^\n:]{1,80})"

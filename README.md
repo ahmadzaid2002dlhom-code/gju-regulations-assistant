@@ -9,7 +9,9 @@ searchable text, and 768-dimensional vectors.
 
 - Checksum-based PDF ingestion and version tracking
 - Page-level PyMuPDF extraction with printed-page heuristics
+- OpenAI vision OCR fallback for image-only pages
 - English and Arabic article and heading detection
+- Logical reading-order repair for visually stored Arabic PDF text
 - Article-preserving chunks with token overlap only for long articles
 - OpenAI `text-embedding-3-small` embeddings at 768 dimensions
 - Supabase vector, full-text, and section-title search
@@ -17,17 +19,18 @@ searchable text, and 768-dimensional vectors.
 - OpenAI Responses API answers restricted to retrieved evidence
 - Streamlit source cards, official links, and evidence inspection
 - Row-level security that gives the public app read-only access to current data
-- Unit tests for chunking, retrieval merging, languages, and citations
+- Unit tests for chunking, PDF/OCR extraction, retrieval, languages, and citations
 
 ## 1. Create the local environment
 
-The existing `.env` is ignored by Git and already contains `OPENAI_API_KEY`.
-Do not replace or commit it. Add the Supabase values to that same file:
+Copy `.env.example` to `.env` and fill in the credentials. The local `.env` is
+ignored by Git and must never be committed:
 
 ```text
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 SUPABASE_ANON_KEY=YOUR_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+OPENAI_OCR_MODEL=gpt-5.6-luna
 ```
 
 The public Streamlit app uses only the anonymous key. The service-role key is
@@ -55,8 +58,10 @@ it requires changing the SQL vector type and regenerating all embeddings.
 
 ## 3. Configure official documents
 
-Copy real official PDF URLs into `data/sources.json`. Use
-`data/sources.example.json` as the shape, but do not ingest its placeholder URL.
+`data/sources.json` is configured with all four files listed on the official
+[GJU Laws & Regulations page](https://www.gju.edu.jo/content/laws-regulations-3492):
+the English and Arabic 2026 books and both National Integrity Standards files.
+Update this manifest when GJU publishes a new version.
 
 ```json
 [
@@ -72,8 +77,8 @@ Copy real official PDF URLs into `data/sources.json`. Use
 ]
 ```
 
-Use `language: "ar"` for Arabic documents and `document_type: "german_year"`
-for German Year material.
+Use `language: "ar"` for Arabic documents. Image-only pages are OCRed only when
+ordinary PDF extraction returns no text.
 
 ## 4. Apply the first ingestion
 

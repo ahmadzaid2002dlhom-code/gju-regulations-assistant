@@ -11,7 +11,7 @@ from src.ingestion.chunker import create_chunks
 from src.ingestion.downloader import calculate_checksum, download_pdf, safe_pdf_filename
 from src.ingestion.embedding_service import EmbeddingProvider
 from src.ingestion.heading_detector import detect_sections
-from src.ingestion.pdf_extractor import extract_pdf_pages
+from src.ingestion.pdf_extractor import OCRProvider, extract_pdf_pages
 from src.models import DetectedSection, ExtractedPage, PreparedChunk, SourceDefinition
 
 
@@ -74,12 +74,14 @@ class IngestionPipeline:
         raw_dir: Path = Path("data/raw"),
         processed_dir: Path = Path("data/processed"),
         embedding_batch_size: int = 32,
+        ocr_provider: OCRProvider | None = None,
     ) -> None:
         self._repository = repository
         self._embedding_provider = embedding_provider
         self._raw_dir = raw_dir
         self._processed_dir = processed_dir
         self._embedding_batch_size = embedding_batch_size
+        self._ocr_provider = ocr_provider
 
     def ingest(self, source: SourceDefinition, *, force: bool = False) -> IngestionResult:
         filename = safe_pdf_filename(source.title, str(source.url))
@@ -105,7 +107,11 @@ class IngestionPipeline:
         )
 
         try:
-            pages = extract_pdf_pages(pdf_path)
+            pages = extract_pdf_pages(
+                pdf_path,
+                ocr_provider=self._ocr_provider,
+                language=source.language,
+            )
             sections = detect_sections(pages)
             _apply_section_titles(pages, sections)
             chunks = create_chunks(

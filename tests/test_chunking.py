@@ -65,3 +65,12 @@ def test_arabic_article_digits_are_normalized() -> None:
     assert len(sections) == 1
     assert sections[0].section_type == "article"
     assert sections[0].article_number == "18"
+
+
+def test_arabic_reversed_parentheses_are_detected() -> None:
+    pages = [ExtractedPage(373, "المادة )١٣(\nيجوز أن يزيد الحد الأعلى للنصاب الدراسي.")]
+
+    sections = detect_sections(pages)
+
+    assert len(sections) == 1
+    assert sections[0].article_number == "13"
